@@ -241,9 +241,9 @@ function LeilaoDetalhesContent({
       </HeaderComponent>
 
       <div className="flex-grow overflow-hidden flex flex-col">
-        <div className="flex justify-between items-center gap-2 px-5 py-2">
+        <div className={`flex w-full ${leilao?.tipo === 1 ? "justify-between" : "justify-end"} items-center gap-2 px-5 py-2`}>
           {lotesData?.result?.some((l) => l.status === 2) &&
-            leilao?.status === 4 && (
+            leilao?.tipo === 1 && leilao.status === 4 && (
               <Badge variant="destructive">
                 <Circle
                   className="w-3 h-3 mr-2 animate-pulse duration-1050"
@@ -258,7 +258,7 @@ function LeilaoDetalhesContent({
             )}
 
           {!lotesData?.result?.some((l) => l.status === 2) &&
-            leilao?.status === 4 && (
+            leilao?.status === 1 && leilao?.tipo === 4 && (
               <Badge variant="destructive">
                 <Circle className="w-3 h-3 mr-2" fill="currentColor" />
                 Lote em Pregão: Verificando...

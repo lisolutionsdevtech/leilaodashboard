@@ -52,6 +52,7 @@ export type StatsResumo = {
 
 export type LeilaoResumo = {
   id: number;
+  tipo?: number;
   slug?: string | null;
   codigo?: string | null;
   numero?: number | null;
