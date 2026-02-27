@@ -164,7 +164,8 @@ function LeilaoDetalhesContent({
     // Prévia de Vendas: Soma de lances dos lotes alvo
     const totalPreviaVendas = lotes.reduce((acc, l) => {
       if (isTargetStatus(l)) {
-        return acc + parseFloat(l.valorLanceAtual || "0");
+        return acc + 
+        (l.status === 100 ? parseFloat(l.valorArremate || "0") : parseFloat(l.valorLanceAtual || "0"));
       }
       return acc;
     }, 0);
