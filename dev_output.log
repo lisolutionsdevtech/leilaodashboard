@@ -1,0 +1,40 @@
+
+> temp-app@0.1.0 dev
+> next dev --webpack
+
+▲ Next.js 16.1.6 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ (serwist) Bundling the service worker script with the URL '/sw.js' and the scope '/'...
+✓ Ready in 2.3s
+○ Compiling /verify-cartaz ...
+ GET /verify-cartaz 200 in 10.9s (compile: 10.2s, render: 621ms)
+○ Compiling /api/image-proxy ...
+ GET /verify-cartaz 200 in 142ms (compile: 81ms, render: 61ms)
+Error proxying image: Error: External response status: 404
+    at GET (src/app/api/image-proxy/route.ts:12:33)
+  10 |     try {
+  11 |         const response = await fetch(url);
+> 12 |         if (!response.ok) throw new Error(`External response status: ${response.status}`);
+     |                                 ^
+  13 |
+  14 |         const blob = await response.blob();
+  15 |         const headers = new Headers();
+ GET /api/image-proxy?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1550537687-c91357f1839e%3Fq%3D80%26w%3D2071%26auto%3Dformat%26fit%3Dcrop 500 in 3.9s (compile: 3.3s, render: 538ms)
+Error proxying image: Error: External response status: 404
+    at GET (src/app/api/image-proxy/route.ts:12:33)
+  10 |     try {
+  11 |         const response = await fetch(url);
+> 12 |         if (!response.ok) throw new Error(`External response status: ${response.status}`);
+     |                                 ^
+  13 |
+  14 |         const blob = await response.blob();
+  15 |         const headers = new Headers();
+ GET /api/image-proxy?url=https%3A%2F%2Flogodownload.org%2Fwp-content%2Fuploads%2F2014%2F05%2Fbanco-santander-logo-1.png 500 in 4.4s (compile: 3.7s, render: 747ms)
