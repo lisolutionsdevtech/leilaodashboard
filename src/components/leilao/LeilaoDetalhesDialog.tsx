@@ -164,8 +164,8 @@ function LeilaoDetalhesContent({
     // Prévia de Vendas: Soma de lances dos lotes alvo
     const totalPreviaVendas = lotes.reduce((acc, l) => {
       if (isTargetStatus(l)) {
-        return acc + 
-        (l.status === 100 ? parseFloat(l.valorArremate || "0") : parseFloat(l.valorLanceAtual || "0"));
+        return acc +
+          (l.status === 100 ? parseFloat(l.valorArremate || "0") : parseFloat(l.valorLanceAtual || "0"));
       }
       return acc;
     }, 0);
@@ -1022,6 +1022,7 @@ function ArteResultadoTabContent({
   // Dicionário para você ajustar nomes manualmente conforme sua necessidade
   const correcoesNomes: Record<string, string> = {
     "MAPFRE REMOCOES ESPECIAIS": "MAPFRE SEGUROS",
+    "YLM SEGUROS S.A": "HDI SEGUROS"
     // Adicione outros aqui no formato "NOME QUE VEM ERRADO": "NOME CORRETO"
   };
 
