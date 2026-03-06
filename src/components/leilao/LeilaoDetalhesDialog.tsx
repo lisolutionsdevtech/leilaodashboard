@@ -1061,6 +1061,7 @@ function ArteResultadoTabContent({
   // Dicionário para você ajustar nomes manualmente conforme sua necessidade
   const correcoesNomes: Record<string, string> = {
     "MAPFRE REMOCOES ESPECIAIS": "MAPFRE SEGUROS",
+    "YLM SEGUROS S.A": "HDI SEGUROS",
     // Adicione outros aqui no formato "NOME QUE VEM ERRADO": "NOME CORRETO"
   };
 
