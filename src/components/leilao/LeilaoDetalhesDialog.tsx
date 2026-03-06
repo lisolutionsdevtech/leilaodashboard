@@ -148,6 +148,8 @@ function LeilaoDetalhesContent({
 
     // Definições de status
     const isVendido = (l: LoteResumo) => l.status === 100;
+    const isCancelado = (l: LoteResumo) => l.status === 11;
+    const isBaixaOferta = (l: LoteResumo) => l.status === 9;
     const isCondicional = (l: LoteResumo) => l.status === 7;
     const isAberto = (l: LoteResumo) => l.status === 1;
     // status para Retirado (comum ser 0 ou 99, mas vou tentar identificar se vier no stats original ou deixar 0)
@@ -155,6 +157,8 @@ function LeilaoDetalhesContent({
 
     const vendidos = lotes.filter(isVendido).length;
     const condicionais = lotes.filter(isCondicional).length;
+    const baixaOferta = lotes.filter(isBaixaOferta).length;
+    const cancelados = lotes.filter(isCancelado).length;
     const retirados = lotes.filter(isRetirado).length;
 
     // Regra: "Aberto, Vendido ou Condicional"
@@ -164,8 +168,12 @@ function LeilaoDetalhesContent({
     // Prévia de Vendas: Soma de lances dos lotes alvo
     const totalPreviaVendas = lotes.reduce((acc, l) => {
       if (isTargetStatus(l)) {
-        return acc + 
-        (l.status === 100 ? parseFloat(l.valorArremate || "0") : parseFloat(l.valorLanceAtual || "0"));
+        return (
+          acc +
+          (l.status === 100
+            ? parseFloat(l.valorArremate || "0")
+            : parseFloat(l.valorLanceAtual || "0"))
+        );
       }
       return acc;
     }, 0);
@@ -176,7 +184,10 @@ function LeilaoDetalhesContent({
       return hasBid && isTargetStatus(l);
     }).length;
 
-    const percentLeiloado = total > 0 ? (lotsWithBidInTarget / total) * 100 : 0;
+    const percentLeiloado =
+      total > 0
+        ? ((lotsWithBidInTarget - baixaOferta - cancelados) / total) * 100
+        : 0;
 
     const comLance = lotes.filter(
       (l) => parseFloat(l.valorLanceAtual || "0") > 0,
@@ -185,12 +196,15 @@ function LeilaoDetalhesContent({
 
     // Não Vendidos: Total - Vendidos - Condicionais - Retirados (apenas se finalizado?)
     // Seguiremos a lógica de exclusão
-    const naoVendidos = total - vendidos - condicionais - retirados;
+    const naoVendidos =
+      total - vendidos - condicionais - retirados - baixaOferta - cancelados;
 
     return {
       total,
       vendidos,
       condicionais,
+      baixaOferta,
+      cancelados,
       retirados,
       naoVendidos,
       totalPreviaVendas,
@@ -242,9 +256,12 @@ function LeilaoDetalhesContent({
       </HeaderComponent>
 
       <div className="flex-grow overflow-hidden flex flex-col">
-        <div className={`flex w-full ${leilao?.tipo === 1 ? "justify-between" : "justify-end"} items-center gap-2 px-5 py-2`}>
+        <div
+          className={`flex w-full ${leilao?.tipo === 1 ? "justify-between" : "justify-end"} items-center gap-2 px-5 py-2`}
+        >
           {lotesData?.result?.some((l) => l.status === 2) &&
-            leilao?.tipo === 1 && leilao.status === 4 && (
+            leilao?.tipo === 1 &&
+            leilao.status === 4 && (
               <Badge variant="destructive">
                 <Circle
                   className="w-3 h-3 mr-2 animate-pulse duration-1050"
@@ -259,7 +276,8 @@ function LeilaoDetalhesContent({
             )}
 
           {!lotesData?.result?.some((l) => l.status === 2) &&
-            leilao?.status === 1 && leilao?.tipo === 4 && (
+            leilao?.status === 1 &&
+            leilao?.tipo === 4 && (
               <Badge variant="destructive">
                 <Circle className="w-3 h-3 mr-2" fill="currentColor" />
                 Lote em Pregão: Verificando...
@@ -509,7 +527,9 @@ function LotesTabContent({
       <div className="flex items-center justify-between border-b pb-2">
         <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider text-wrap">
           Lista de Lotes |
-          <Badge className="ml-2 font-mono">{stats.total + stats.retirados} Itens</Badge>
+          <Badge className="ml-2 font-mono">
+            {stats.total + stats.retirados} Itens
+          </Badge>
           <Badge
             onClick={() => setLotesSemLance(!lotesSemLance)}
             className={`ml-2 border-[1px] font-mono ${lotesSemLance ? "bg-yellow-700 hover:bg-yellow-600 text-yellow-100" : "hover:bg-yellow-200 bg-yellow-100 text-yellow-700"} hover:cursor-pointer`}
@@ -525,8 +545,132 @@ function LotesTabContent({
         )}
         {lotesSemLance
           ? lotes
-            .filter((lote) => !lote.lanceAtual)
-            .map((lote) => (
+              .filter((lote) => !lote.lanceAtual)
+              .map((lote) => (
+                <div
+                  key={lote.id}
+                  className={`flex gap-4 p-4 border rounded-lg hover:bg-muted transition-colors hover:cursor-pointer ${lote.status === 10 && "bg-red-100 hover:bg-red-200"} `}
+                >
+                  <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-md bg-muted">
+                    {lote.image?.thumb?.url || lote.bem?.image?.thumb?.url ? (
+                      <Image
+                        src={
+                          lote.image?.thumb?.url ||
+                          lote.bem?.image?.thumb?.url ||
+                          ""
+                        }
+                        alt={lote.siteTitulo || lote.bem?.siteTitulo || ""}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <FileText className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="absolute top-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-bold">
+                      LOTE {lote.numero}
+                    </div>
+                  </div>
+                  <div className="flex-grow min-w-0 space-y-1">
+                    <h4 className="font-bold text-sm line-clamp-2">
+                      {lote.siteTitulo || lote.bem?.siteTitulo}
+                    </h4>
+                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                      {lote.bem?.comitente?.pessoa?.name && (
+                        <span className="flex items-center gap-1">
+                          <User className="h-3 w-3" />{" "}
+                          {lote.bem.comitente.pessoa.name}
+                        </span>
+                      )}
+                    </div>
+                    <div className="pt-2 flex justify-between items-end">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="space-y-0.5">
+                          <p className="text-[10px] uppercase text-muted-foreground font-medium">
+                            Lance Atual
+                          </p>
+                          <p className="font-bold text-primary">
+                            {lote.valorLanceAtual
+                              ? formatBRL(lote.valorLanceAtual)
+                              : "Sem Lance"}
+                          </p>
+                        </div>
+                        <div className="space-y-0.5">
+                          {lote.valorAvaliacao !== "0.00" && (
+                            <>
+                              <p className="text-[10px] uppercase text-muted-foreground font-medium">
+                                Avaliação
+                              </p>
+                              <p className="font-bold text-primary">
+                                {formatBRL(lote.valorAvaliacao || "0")}
+                              </p>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {lote.status === 100 && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-green-100 text-green-700 hover:bg-green-100"
+                        >
+                          Vendido
+                        </Badge>
+                      )}
+                      {lote.status === 2 && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-gray-100 text-violet-700 hover:bg-gray-100"
+                        >
+                          Em Pregão
+                        </Badge>
+                      )}
+                      {lote.status === 5 && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-blue-100 text-blue-700 hover:bg-blue-100"
+                        >
+                          Homologando
+                        </Badge>
+                      )}
+                      {lote.status === 7 && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-purple-100 text-purple-700 hover:bg-purple-100"
+                        >
+                          Condicional
+                        </Badge>
+                      )}
+                      {lote.status === 1 && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
+                        >
+                          Aberto
+                        </Badge>
+                      )}
+                      {lote.status === 10 && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-red-100 text-red-700 hover:bg-red-100"
+                        >
+                          Retirado
+                        </Badge>
+                      )}
+                      {lote.status === 8 && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
+                        >
+                          Sem Licitante
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+          : lotes.map((lote) => (
               <div
                 key={lote.id}
                 className={`flex gap-4 p-4 border rounded-lg hover:bg-muted transition-colors hover:cursor-pointer ${lote.status === 10 && "bg-red-100 hover:bg-red-200"} `}
@@ -649,131 +793,7 @@ function LotesTabContent({
                   </div>
                 </div>
               </div>
-            ))
-          : lotes.map((lote) => (
-            <div
-              key={lote.id}
-              className={`flex gap-4 p-4 border rounded-lg hover:bg-muted transition-colors hover:cursor-pointer ${lote.status === 10 && "bg-red-100 hover:bg-red-200"} `}
-            >
-              <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-md bg-muted">
-                {lote.image?.thumb?.url || lote.bem?.image?.thumb?.url ? (
-                  <Image
-                    src={
-                      lote.image?.thumb?.url ||
-                      lote.bem?.image?.thumb?.url ||
-                      ""
-                    }
-                    alt={lote.siteTitulo || lote.bem?.siteTitulo || ""}
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <FileText className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                )}
-                <div className="absolute top-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-bold">
-                  LOTE {lote.numero}
-                </div>
-              </div>
-              <div className="flex-grow min-w-0 space-y-1">
-                <h4 className="font-bold text-sm line-clamp-2">
-                  {lote.siteTitulo || lote.bem?.siteTitulo}
-                </h4>
-                <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                  {lote.bem?.comitente?.pessoa?.name && (
-                    <span className="flex items-center gap-1">
-                      <User className="h-3 w-3" />{" "}
-                      {lote.bem.comitente.pessoa.name}
-                    </span>
-                  )}
-                </div>
-                <div className="pt-2 flex justify-between items-end">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="space-y-0.5">
-                      <p className="text-[10px] uppercase text-muted-foreground font-medium">
-                        Lance Atual
-                      </p>
-                      <p className="font-bold text-primary">
-                        {lote.valorLanceAtual
-                          ? formatBRL(lote.valorLanceAtual)
-                          : "Sem Lance"}
-                      </p>
-                    </div>
-                    <div className="space-y-0.5">
-                      {lote.valorAvaliacao !== "0.00" && (
-                        <>
-                          <p className="text-[10px] uppercase text-muted-foreground font-medium">
-                            Avaliação
-                          </p>
-                          <p className="font-bold text-primary">
-                            {formatBRL(lote.valorAvaliacao || "0")}
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {lote.status === 100 && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-green-100 text-green-700 hover:bg-green-100"
-                    >
-                      Vendido
-                    </Badge>
-                  )}
-                  {lote.status === 2 && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-gray-100 text-violet-700 hover:bg-gray-100"
-                    >
-                      Em Pregão
-                    </Badge>
-                  )}
-                  {lote.status === 5 && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-blue-100 text-blue-700 hover:bg-blue-100"
-                    >
-                      Homologando
-                    </Badge>
-                  )}
-                  {lote.status === 7 && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-purple-100 text-purple-700 hover:bg-purple-100"
-                    >
-                      Condicional
-                    </Badge>
-                  )}
-                  {lote.status === 1 && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
-                    >
-                      Aberto
-                    </Badge>
-                  )}
-                  {lote.status === 10 && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-red-100 text-red-700 hover:bg-red-100"
-                    >
-                      Retirado
-                    </Badge>
-                  )}
-                  {lote.status === 8 && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
-                    >
-                      Sem Licitante
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
       </div>
     </div>
   );
@@ -786,7 +806,11 @@ import { pegarLogoComitente } from "@/utils/leilao";
 
 const CartazLeilaoResumo = dynamic(() => import("./CartazLeilaoResumo"), {
   ssr: false,
-  loading: () => <div className="p-4 w-full h-full flex items-center justify-center"><Skeleton className="h-[400px] w-full max-w-[560px] mx-auto rounded-3xl" /></div>,
+  loading: () => (
+    <div className="p-4 w-full h-full flex items-center justify-center">
+      <Skeleton className="h-[400px] w-full max-w-[560px] mx-auto rounded-3xl" />
+    </div>
+  ),
 });
 
 function ResumoTabContent({
@@ -894,7 +918,11 @@ function ResumoTabContent({
               <td className="p-3 text-right">{stats.comLance || 0}</td>
             </tr>
             <tr>
-              <td className="p-3 font-medium">{leilao.status !== 99 ? "Arrecadação (Prévia)" : "Arrecadação (Vendidos)"}</td>
+              <td className="p-3 font-medium">
+                {leilao.status !== 99
+                  ? "Arrecadação (Prévia)"
+                  : "Arrecadação (Vendidos)"}
+              </td>
               <td className="p-3 text-right font-bold">
                 {formatBRL(stats.totalPreviaVendas)}
               </td>
@@ -930,7 +958,9 @@ function ResumoTabContent({
           <tbody className="divide-y">
             <tr className="bg-muted/30">
               <td className="p-3 font-medium">Lotes</td>
-              <td className="p-3 text-right">Total: {stats.total + stats.retirados}</td>
+              <td className="p-3 text-right">
+                Total: {stats.total + stats.retirados}
+              </td>
             </tr>
             <tr>
               <td className="p-3 font-medium">Disponíveis</td>
@@ -946,7 +976,11 @@ function ResumoTabContent({
               <tr className="bg-blue-50 border border-blue-200">
                 <td className="p-3">Abertos Com lance</td>
                 <td className="p-3 text-right">
-                  {stats.comLance - stats.vendidos - stats.condicionais}
+                  {stats.comLance -
+                    stats.vendidos -
+                    stats.condicionais -
+                    stats.baixaOferta -
+                    stats.cancelados}
                 </td>
               </tr>
             )}
@@ -960,7 +994,12 @@ function ResumoTabContent({
             </tr>
             <tr className="bg-yellow-50 border border-yellow-200">
               <td className="p-3">Não Vendidos</td>
-              <td className="p-3 text-right">{stats.total - stats.comLance}</td>
+              <td className="p-3 text-right">
+                {stats.total -
+                  stats.comLance +
+                  stats.baixaOferta +
+                  stats.cancelados}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -1033,7 +1072,6 @@ function ArteResultadoTabContent({
   return (
     // Reduzimos o gap (space-y-2), o padding (pt-2 pb-4) e mudamos justify-center para justify-start
     <div className="flex-1 flex flex-col items-center justify-start space-y-2 pt-2 pb-4 h-full min-h-0 ">
-
       {/* Opções de customização da Arte */}
       <div className="w-full flex justify-end px-4 mb-2">
         <Button
