@@ -239,7 +239,7 @@ export default function RelatorioLotesPage() {
                   const descricao = lote.siteDescricao || lote.bem?.siteDescricao || "";
 
                   return (
-                    <tr key={lote.id} className="border-b border-slate-100 group even:bg-slate-50/50 print:even:bg-slate-50/50">
+                    <tr key={lote.id} className="border-b border-slate-100 group even:bg-slate-100 print:even:bg-slate-100">
                       <td className="py-2.5 px-2 text-center align-middle">
                         <span className="text-base font-black text-slate-800">{lote.numero}</span>
                       </td>
