@@ -177,44 +177,57 @@ export default function RelatorioLotesPage() {
       {/* Fixed Layout Container for A4 Feel */}
       <div className="min-w-fit flex justify-center p-0 md:p-8 print:p-0">
         <div id="report-content" className="w-[800px] bg-white shadow-xl print:shadow-none min-h-screen p-12 print:p-8">
-          {/* Header */}
-          <div className="flex justify-between items-center border-b pb-8">
-            <div>
-              <img src="/client/logo.png" alt="Leilões PB" className="h-16 w-auto" onError={(e) => {
-                (e.target as HTMLImageElement).src = "https://www.leiloespb.com.br/client/logo.png?v=2";
-              }} />
-            </div>
-            <div className="text-right flex flex-col items-end">
-              <span className="text-lg font-bold text-slate-900 leading-tight">Leilões PB</span>
-              <span className="text-sm text-slate-500">www.leiloespb.com.br</span>
-              <h1 className="text-xl font-black mt-4 text-slate-800 uppercase leading-tight">Leilão: {leilao.titulo}</h1>
-            </div>
-          </div>
 
-          {/* Leilao Info Card */}
-          <div className="mt-8 p-6 bg-slate-50 border rounded-2xl flex gap-6 items-center">
-            <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-white border flex items-center justify-center p-2">
-              {getLeilaoImageUrl(leilao) ? (
-                <img src={proxyImageUrl(getLeilaoImageUrl(leilao))} alt="Logo" className="max-h-full max-w-full object-contain" />
-              ) : (
-                <div className="text-slate-300 font-bold text-2xl">{leilao.titulo?.charAt(0)}</div>
-              )}
+
+          {/* Leilao Info Card Integrated with Branding */}
+          <div className="p-8 bg-slate-50 border border-slate-200 rounded-3xl flex justify-between items-center relative overflow-hidden shadow-sm">
+            {/* Background Accent */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-slate-100/50 rounded-full -mr-16 -mt-16" />
+            
+            <div className="flex gap-8 items-center relative z-10">
+              <div className="h-32 w-32 shrink-0 overflow-hidden rounded-2xl bg-white border border-slate-200 flex items-center justify-center p-3 shadow-sm">
+                {getLeilaoImageUrl(leilao) ? (
+                  <img src={proxyImageUrl(getLeilaoImageUrl(leilao))} alt="Logo Leilão" className="max-h-full max-w-full object-contain" />
+                ) : (
+                  <div className="text-slate-200 font-bold text-4xl">{leilao.titulo?.charAt(0)}</div>
+                )}
+              </div>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900 leading-tight">{leilao.titulo}</h2>
+                  <p className="text-slate-500 text-sm font-medium mt-1">Dados detalhados do evento</p>
+                </div>
+                <div className="flex gap-10">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider">Abertura</span>
+                    <span className="text-sm font-bold text-slate-700">{formatarData(leilao.dataAbertura)}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider">Modalidade</span>
+                    <span className="text-sm font-bold text-slate-700">{getModalidade(leilao.tipo)}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider">Lotes</span>
+                    <span className="text-sm font-bold text-slate-700">{lotes.length} unidades</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex-grow">
-              <h2 className="text-lg font-bold text-slate-900 leading-tight">{leilao.titulo}</h2>
-              <div className="grid grid-cols-2 gap-x-8 gap-y-2 mt-3">
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Abertura</span>
-                  <span className="text-sm font-medium">{formatarData(leilao.dataAbertura)}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Modalidade</span>
-                  <span className="text-sm font-medium">{getModalidade(leilao.tipo)}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Total de Lotes</span>
-                  <span className="text-sm font-medium">{lotes.length} lotes</span>
-                </div>
+
+            {/* Branding integrated on the right */}
+            <div className="flex flex-col items-end gap-2 relative z-10 border-l border-slate-200 pl-8 ml-4 min-w-[160px]">
+              <div className="h-16 flex items-center justify-end">
+                <img 
+                  src={proxyImageUrl("https://static.suporteleiloes.com.br/leiloespbcombr/arquivos-avulsos/1/6888fb648ac79-6888fb64a86df.jpg")} 
+                  alt="Leilões PB" 
+                  className="max-h-full w-auto object-contain" 
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://www.leiloespb.com.br/client/logo.png?v=2";
+                  }} 
+                />
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] text-slate-400 font-medium">www.leiloespb.com.br</p>
               </div>
             </div>
           </div>
