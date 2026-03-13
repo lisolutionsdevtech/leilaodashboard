@@ -220,7 +220,7 @@ export default function RelatorioLotesPage() {
           </div>
 
           {/* Lotes Table */}
-          <div className="mt-10">
+          <div className="mt-6">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b-2 border-slate-900 text-left text-[10px] uppercase font-black text-slate-400 tracking-wider">
@@ -239,12 +239,12 @@ export default function RelatorioLotesPage() {
                   const descricao = lote.siteDescricao || lote.bem?.siteDescricao || "";
 
                   return (
-                    <tr key={lote.id} className="border-b border-slate-100 group">
-                      <td className="py-4 px-2 text-center align-middle">
-                        <span className="text-lg font-black text-slate-800">{lote.numero}</span>
+                    <tr key={lote.id} className="border-b border-slate-100 group even:bg-slate-50/50 print:even:bg-slate-50/50">
+                      <td className="py-2.5 px-2 text-center align-middle">
+                        <span className="text-base font-black text-slate-800">{lote.numero}</span>
                       </td>
-                      <td className="py-4 px-2 align-middle">
-                        <div className="w-16 h-16 rounded-md overflow-hidden bg-slate-50 border flex items-center justify-center">
+                      <td className="py-2.5 px-2 align-middle">
+                        <div className="w-12 h-12 rounded-md overflow-hidden bg-white border flex items-center justify-center shadow-sm">
                           {imageUrl ? (
                             <img 
                               src={proxyImageUrl(imageUrl)} 
@@ -253,36 +253,36 @@ export default function RelatorioLotesPage() {
                               onError={(e) => (e.currentTarget.style.display = "none")}
                             />
                           ) : (
-                            <div className="text-[10px] text-slate-300">Sem foto</div>
+                            <div className="text-[9px] text-slate-300">Sem foto</div>
                           )}
                         </div>
                       </td>
-                      <td className="py-4 px-4 align-top">
-                        <h3 className="text-sm font-bold text-slate-900 leading-tight mb-1">{lote.siteTitulo || lote.bem?.siteTitulo}</h3>
+                      <td className="py-2.5 px-4 align-top">
+                        <h3 className="text-[12px] font-bold text-slate-900 leading-tight mb-0.5">{lote.siteTitulo || lote.bem?.siteTitulo}</h3>
                         <div 
-                          className="text-[11px] text-slate-500 leading-relaxed max-w-sm"
-                          dangerouslySetInnerHTML={{ __html: descricao.replace(/\n/g, "<br>") }}
+                          className="text-[10px] text-slate-500 leading-snug max-w-sm"
+                          dangerouslySetInnerHTML={{ __html: (descricao || "").replace(/\n/g, "<br>") }}
                         />
                       </td>
-                      <td className="py-4 px-4 align-middle text-right">
+                      <td className="py-2.5 px-4 align-middle text-right">
                         {valorLanceAtual > 0 ? (
                           <div className="flex flex-col">
-                            <span className="text-[9px] uppercase font-bold text-slate-400">Lance Atual</span>
-                            <span className="text-sm font-black text-emerald-600 whitespace-nowrap">{formatBRL(valorLanceAtual)}</span>
+                            <span className="text-[8px] uppercase font-bold text-slate-400 leading-none">Lance Atual</span>
+                            <span className="text-[12px] font-black text-emerald-600 whitespace-nowrap">{formatBRL(valorLanceAtual)}</span>
                           </div>
                         ) : (
                           <div className="flex flex-col">
-                            <span className="text-[9px] uppercase font-bold text-slate-400">Lance Inicial</span>
-                            <span className="text-sm font-black text-slate-900 whitespace-nowrap">{formatBRL(lote.valorMinimo || 0)}</span>
+                            <span className="text-[8px] uppercase font-bold text-slate-400 leading-none">Lance Inicial</span>
+                            <span className="text-[12px] font-black text-slate-900 whitespace-nowrap">{formatBRL(lote.valorMinimo || 0)}</span>
                           </div>
                         )}
                       </td>
-                      <td className="py-4 px-2 align-middle text-center">
-                        <div className="w-10 h-10 mx-auto flex items-center justify-center p-1 bg-white rounded border">
+                      <td className="py-2.5 px-2 align-middle text-center">
+                        <div className="w-8 h-8 mx-auto flex items-center justify-center p-1 bg-white rounded border shadow-sm">
                           {comitenteImg ? (
                             <img src={proxyImageUrl(comitenteImg)} alt="C" className="max-w-full max-h-full object-contain" />
                           ) : (
-                            <span className="text-[8px] font-bold text-slate-300">N/A</span>
+                            <span className="text-[7px] font-bold text-slate-300">N/A</span>
                           )}
                         </div>
                       </td>
@@ -293,10 +293,7 @@ export default function RelatorioLotesPage() {
             </table>
           </div>
 
-          {/* Footer */}
-          <div className="mt-12 text-center text-[10px] text-slate-400 uppercase tracking-[0.2em] font-bold">
-            Relatório gerado em {new Date().toLocaleDateString("pt-BR")} às {new Date().toLocaleTimeString("pt-BR")}
-          </div>
+
         </div>
       </div>
 
