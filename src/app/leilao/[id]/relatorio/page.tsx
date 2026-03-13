@@ -265,17 +265,35 @@ export default function RelatorioLotesPage() {
                         />
                       </td>
                       <td className="py-2.5 px-4 align-middle text-right">
-                        {valorLanceAtual > 0 ? (
+                        <div className="flex flex-col gap-1.5 py-1">
+                          {/* Lance Inicial */}
                           <div className="flex flex-col">
-                            <span className="text-[8px] uppercase font-bold text-slate-400 leading-none">Lance Atual</span>
-                            <span className="text-[12px] font-black text-emerald-600 whitespace-nowrap">{formatBRL(valorLanceAtual)}</span>
+                            <span className="text-[7.5px] uppercase font-bold text-slate-400 leading-none">Lance Inicial</span>
+                            <span className="text-[11px] font-bold text-slate-700 whitespace-nowrap">{formatBRL(lote.valorMinimo)}</span>
                           </div>
-                        ) : (
-                          <div className="flex flex-col">
-                            <span className="text-[8px] uppercase font-bold text-slate-400 leading-none">Lance Inicial</span>
-                            <span className="text-[12px] font-black text-slate-900 whitespace-nowrap">{formatBRL(lote.valorMinimo || 0)}</span>
-                          </div>
-                        )}
+
+                          {/* Separador se houver Lance Atual */}
+                          {valorLanceAtual > 0 && <div className="h-px bg-slate-100 w-full" />}
+
+                          {/* Lance Atual (Apenas se houver) */}
+                          {valorLanceAtual > 0 && (
+                            <div className="flex flex-col">
+                              <span className="text-[7.5px] uppercase font-bold text-slate-400 leading-none">Lance Atual</span>
+                              <span className="text-[12px] font-black text-emerald-600 whitespace-nowrap">{formatBRL(valorLanceAtual)}</span>
+                            </div>
+                          )}
+
+                          {/* Separador se houver Avaliação */}
+                          {parseFloat(lote.valorAvaliacao || "0") > 0 && <div className="h-px bg-slate-100 w-full" />}
+
+                          {/* Avaliação */}
+                          {parseFloat(lote.valorAvaliacao || "0") > 0 && (
+                            <div className="flex flex-col">
+                              <span className="text-[7.5px] uppercase font-bold text-slate-400 leading-none">Avaliação</span>
+                              <span className="text-[11px] font-bold text-slate-500 whitespace-nowrap">{formatBRL(lote.valorAvaliacao)}</span>
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="py-2.5 px-2 align-middle text-center">
                         <div className="w-8 h-8 mx-auto flex items-center justify-center p-1 bg-white rounded border shadow-sm">
