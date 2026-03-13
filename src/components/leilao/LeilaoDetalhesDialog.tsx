@@ -375,6 +375,7 @@ function LeilaoDetalhesContent({
             >
               <ScrollArea className="h-full px-6 pb-6">
                 <LotesTabContent
+                  leilao={leilao}
                   lotes={calculatedStats?.lotesRaw || []}
                   stats={calculatedStats}
                   isLoading={isLoadingLotes}
@@ -426,6 +427,7 @@ function LeilaoDetalhesContent({
 }
 
 function LotesTabContent({
+  leilao,
   lotes,
   stats,
   isLoading,
@@ -433,6 +435,7 @@ function LotesTabContent({
   mutate,
   isValidating,
 }: {
+  leilao: LeilaoResumo;
   lotes: LoteResumo[];
   stats: any;
   isLoading: boolean;
@@ -523,7 +526,17 @@ function LotesTabContent({
           </div>
         </div>
       </div>
-
+      <Button
+        className="flex gap-2"
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          window.open(`/leilao/${leilao.id}/relatorio`, "_blank");
+        }}
+      >
+        <Download className="w-4 h-4" />
+        Exportar PDF
+      </Button>
       <div className="flex items-center justify-between border-b pb-2">
         <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider text-wrap">
           Lista de Lotes |
@@ -545,132 +558,8 @@ function LotesTabContent({
         )}
         {lotesSemLance
           ? lotes
-              .filter((lote) => !lote.lanceAtual)
-              .map((lote) => (
-                <div
-                  key={lote.id}
-                  className={`flex gap-4 p-4 border rounded-lg hover:bg-muted transition-colors hover:cursor-pointer ${lote.status === 10 && "bg-red-100 hover:bg-red-200"} `}
-                >
-                  <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-md bg-muted">
-                    {lote.image?.thumb?.url || lote.bem?.image?.thumb?.url ? (
-                      <Image
-                        src={
-                          lote.image?.thumb?.url ||
-                          lote.bem?.image?.thumb?.url ||
-                          ""
-                        }
-                        alt={lote.siteTitulo || lote.bem?.siteTitulo || ""}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <FileText className="h-8 w-8 text-muted-foreground" />
-                      </div>
-                    )}
-                    <div className="absolute top-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-bold">
-                      LOTE {lote.numero}
-                    </div>
-                  </div>
-                  <div className="flex-grow min-w-0 space-y-1">
-                    <h4 className="font-bold text-sm line-clamp-2">
-                      {lote.siteTitulo || lote.bem?.siteTitulo}
-                    </h4>
-                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                      {lote.bem?.comitente?.pessoa?.name && (
-                        <span className="flex items-center gap-1">
-                          <User className="h-3 w-3" />{" "}
-                          {lote.bem.comitente.pessoa.name}
-                        </span>
-                      )}
-                    </div>
-                    <div className="pt-2 flex justify-between items-end">
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="space-y-0.5">
-                          <p className="text-[10px] uppercase text-muted-foreground font-medium">
-                            Lance Atual
-                          </p>
-                          <p className="font-bold text-primary">
-                            {lote.valorLanceAtual
-                              ? formatBRL(lote.valorLanceAtual)
-                              : "Sem Lance"}
-                          </p>
-                        </div>
-                        <div className="space-y-0.5">
-                          {lote.valorAvaliacao !== "0.00" && (
-                            <>
-                              <p className="text-[10px] uppercase text-muted-foreground font-medium">
-                                Avaliação
-                              </p>
-                              <p className="font-bold text-primary">
-                                {formatBRL(lote.valorAvaliacao || "0")}
-                              </p>
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                      {lote.status === 100 && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-green-100 text-green-700 hover:bg-green-100"
-                        >
-                          Vendido
-                        </Badge>
-                      )}
-                      {lote.status === 2 && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-gray-100 text-violet-700 hover:bg-gray-100"
-                        >
-                          Em Pregão
-                        </Badge>
-                      )}
-                      {lote.status === 5 && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-blue-100 text-blue-700 hover:bg-blue-100"
-                        >
-                          Homologando
-                        </Badge>
-                      )}
-                      {lote.status === 7 && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-purple-100 text-purple-700 hover:bg-purple-100"
-                        >
-                          Condicional
-                        </Badge>
-                      )}
-                      {lote.status === 1 && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
-                        >
-                          Aberto
-                        </Badge>
-                      )}
-                      {lote.status === 10 && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-red-100 text-red-700 hover:bg-red-100"
-                        >
-                          Retirado
-                        </Badge>
-                      )}
-                      {lote.status === 8 && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
-                        >
-                          Sem Licitante
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))
-          : lotes.map((lote) => (
+            .filter((lote) => !lote.lanceAtual)
+            .map((lote) => (
               <div
                 key={lote.id}
                 className={`flex gap-4 p-4 border rounded-lg hover:bg-muted transition-colors hover:cursor-pointer ${lote.status === 10 && "bg-red-100 hover:bg-red-200"} `}
@@ -793,7 +682,131 @@ function LotesTabContent({
                   </div>
                 </div>
               </div>
-            ))}
+            ))
+          : lotes.map((lote) => (
+            <div
+              key={lote.id}
+              className={`flex gap-4 p-4 border rounded-lg hover:bg-muted transition-colors hover:cursor-pointer ${lote.status === 10 && "bg-red-100 hover:bg-red-200"} `}
+            >
+              <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-md bg-muted">
+                {lote.image?.thumb?.url || lote.bem?.image?.thumb?.url ? (
+                  <Image
+                    src={
+                      lote.image?.thumb?.url ||
+                      lote.bem?.image?.thumb?.url ||
+                      ""
+                    }
+                    alt={lote.siteTitulo || lote.bem?.siteTitulo || ""}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <FileText className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                )}
+                <div className="absolute top-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-bold">
+                  LOTE {lote.numero}
+                </div>
+              </div>
+              <div className="flex-grow min-w-0 space-y-1">
+                <h4 className="font-bold text-sm line-clamp-2">
+                  {lote.siteTitulo || lote.bem?.siteTitulo}
+                </h4>
+                <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                  {lote.bem?.comitente?.pessoa?.name && (
+                    <span className="flex items-center gap-1">
+                      <User className="h-3 w-3" />{" "}
+                      {lote.bem.comitente.pessoa.name}
+                    </span>
+                  )}
+                </div>
+                <div className="pt-2 flex justify-between items-end">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="space-y-0.5">
+                      <p className="text-[10px] uppercase text-muted-foreground font-medium">
+                        Lance Atual
+                      </p>
+                      <p className="font-bold text-primary">
+                        {lote.valorLanceAtual
+                          ? formatBRL(lote.valorLanceAtual)
+                          : "Sem Lance"}
+                      </p>
+                    </div>
+                    <div className="space-y-0.5">
+                      {lote.valorAvaliacao !== "0.00" && (
+                        <>
+                          <p className="text-[10px] uppercase text-muted-foreground font-medium">
+                            Avaliação
+                          </p>
+                          <p className="font-bold text-primary">
+                            {formatBRL(lote.valorAvaliacao || "0")}
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {lote.status === 100 && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-green-100 text-green-700 hover:bg-green-100"
+                    >
+                      Vendido
+                    </Badge>
+                  )}
+                  {lote.status === 2 && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-gray-100 text-violet-700 hover:bg-gray-100"
+                    >
+                      Em Pregão
+                    </Badge>
+                  )}
+                  {lote.status === 5 && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-blue-100 text-blue-700 hover:bg-blue-100"
+                    >
+                      Homologando
+                    </Badge>
+                  )}
+                  {lote.status === 7 && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-purple-100 text-purple-700 hover:bg-purple-100"
+                    >
+                      Condicional
+                    </Badge>
+                  )}
+                  {lote.status === 1 && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
+                    >
+                      Aberto
+                    </Badge>
+                  )}
+                  {lote.status === 10 && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-red-100 text-red-700 hover:bg-red-100"
+                    >
+                      Retirado
+                    </Badge>
+                  )}
+                  {lote.status === 8 && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
+                    >
+                      Sem Licitante
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
       </div>
     </div>
   );
@@ -1034,7 +1047,7 @@ function ArteResultadoTabContent({
     return <div className="p-4 text-destructive">Erro ao carregar arte.</div>;
 
   const [semDesistentes, setSemDesistentes] = useState(false);
-
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const stats = statsCalculated;
   const formatBRL = (val: number | string) => {
     const num = typeof val === "string" ? parseFloat(val) : val;

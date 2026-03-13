@@ -98,6 +98,7 @@ export interface LoteResumo {
   valorInicial: string;
   valorIncremento?: string;
   siteTitulo?: string;
+  siteDescricao?: string;
   image?: {
     full?: { url: string };
     thumb?: { url: string };
@@ -106,6 +107,7 @@ export interface LoteResumo {
   bem?: {
     id: number;
     siteTitulo: string;
+    siteDescricao?: string;
     image?: {
       thumb?: { url: string };
     };
