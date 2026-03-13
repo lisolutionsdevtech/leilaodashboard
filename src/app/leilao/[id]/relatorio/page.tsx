@@ -65,7 +65,7 @@ export default function RelatorioLotesPage() {
 
   const handleShare = async () => {
     if (!leilao || !lotesData) return;
-    
+
     try {
       setIsGenerating(true);
       const reportElement = document.getElementById("report-content");
@@ -92,7 +92,7 @@ export default function RelatorioLotesPage() {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       const pageHeight = pdf.internal.pageSize.getHeight();
-      
+
       let heightLeft = pdfHeight;
       let position = 0;
 
@@ -156,7 +156,7 @@ export default function RelatorioLotesPage() {
   return (
     <div className="min-h-screen bg-slate-100 print:bg-white pb-20 print:pb-0 overflow-x-auto overflow-y-auto">
       {/* Toolbar - Oculta na impressão */}
-      <div 
+      <div
         id="report-toolbar"
         className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 bg-white/90 backdrop-blur-md rounded-full border shadow-2xl print:hidden animate-in slide-in-from-bottom-10 whitespace-nowrap"
       >
@@ -183,7 +183,7 @@ export default function RelatorioLotesPage() {
           <div className="p-8 bg-slate-50 border border-slate-200 rounded-3xl flex justify-between items-center relative overflow-hidden shadow-sm">
             {/* Background Accent */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-slate-100/50 rounded-full -mr-16 -mt-16" />
-            
+
             <div className="flex gap-8 items-center relative z-10">
               <div className="h-32 w-32 shrink-0 overflow-hidden rounded-2xl bg-white border border-slate-200 flex items-center justify-center p-3 shadow-sm">
                 {getLeilaoImageUrl(leilao) ? (
@@ -217,17 +217,17 @@ export default function RelatorioLotesPage() {
             {/* Branding integrated on the right */}
             <div className="flex flex-col items-end gap-2 relative z-10 border-l border-slate-200 pl-8 ml-4 min-w-[160px]">
               <div className="h-16 flex items-center justify-end">
-                <img 
-                  src={proxyImageUrl("https://static.suporteleiloes.com.br/leiloespbcombr/arquivos-avulsos/1/6888fb648ac79-6888fb64a86df.jpg")} 
-                  alt="Leilões PB" 
-                  className="max-h-full w-auto object-contain" 
+                <img
+                  src={proxyImageUrl("https://static.suporteleiloes.com.br/leiloespbcombr/arquivos-avulsos/1/6888fb648ac79-6888fb64a86df.jpg")}
+                  alt="Leilões PB"
+                  className="max-h-full w-auto object-contain"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = "https://www.leiloespb.com.br/client/logo.png?v=2";
-                  }} 
+                  }}
                 />
               </div>
               <div className="text-right">
-                <p className="text-[10px] text-slate-400 font-medium">www.leiloespb.com.br</p>
+                <p className="text-[15px] text-slate-400 font-medium">www.leiloespb.com.br</p>
               </div>
             </div>
           </div>
@@ -259,10 +259,10 @@ export default function RelatorioLotesPage() {
                       <td className="py-2.5 px-2 align-middle">
                         <div className="w-12 h-12 rounded-md overflow-hidden bg-white border flex items-center justify-center shadow-sm">
                           {imageUrl ? (
-                            <img 
-                              src={proxyImageUrl(imageUrl)} 
-                              alt={String(lote.numero)} 
-                              className="w-full h-full object-cover" 
+                            <img
+                              src={proxyImageUrl(imageUrl)}
+                              alt={String(lote.numero)}
+                              className="w-full h-full object-cover"
                               onError={(e) => (e.currentTarget.style.display = "none")}
                             />
                           ) : (
@@ -272,7 +272,7 @@ export default function RelatorioLotesPage() {
                       </td>
                       <td className="py-2.5 px-4 align-top">
                         <h3 className="text-[12px] font-bold text-slate-900 leading-tight mb-0.5">{lote.siteTitulo || lote.bem?.siteTitulo}</h3>
-                        <div 
+                        <div
                           className="text-[10px] text-slate-500 leading-snug max-w-sm"
                           dangerouslySetInnerHTML={{ __html: (descricao || "").replace(/\n/g, "<br>") }}
                         />
