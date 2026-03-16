@@ -160,6 +160,8 @@ function LeilaoDetalhesContent({
     const baixaOferta = lotes.filter(isBaixaOferta).length;
     const cancelados = lotes.filter(isCancelado).length;
     const retirados = lotes.filter(isRetirado).length;
+    const semLicitante = lotes.filter((l) => l.status === 8).length;
+    
 
     // Regra: "Aberto, Vendido ou Condicional"
     const isTargetStatus = (l: LoteResumo) =>
@@ -184,15 +186,21 @@ function LeilaoDetalhesContent({
       return hasBid && isTargetStatus(l);
     }).length;
 
-    const percentLeiloado =
-      total > 0
-        ? ((lotsWithBidInTarget - baixaOferta - cancelados) / total) * 100
-        : 0;
+    const semLicitanteEComLance = lotes.filter(
+      (l) => l.status === 8 && parseFloat(l.valorLanceAtual || "0") > 0
+    ).length;
+
+    
 
     const comLance = lotes.filter(
       (l) => parseFloat(l.valorLanceAtual || "0") > 0,
     ).length;
     const semLance = total - comLance;
+
+    const percentLeiloado =
+      total > 0
+        ? ((comLance - baixaOferta - cancelados - semLicitanteEComLance) / total) * 100
+        : 0;
 
     // Não Vendidos: Total - Vendidos - Condicionais - Retirados (apenas se finalizado?)
     // Seguiremos a lógica de exclusão
@@ -208,6 +216,7 @@ function LeilaoDetalhesContent({
       retirados,
       naoVendidos,
       totalPreviaVendas,
+      semLicitanteEComLance,
       percentLeiloado,
       comLance,
       semLance,
@@ -954,6 +963,12 @@ function ResumoTabContent({
                     {formatBRL(statsAPI.totalTaxas)}
                   </td>
                 </tr>
+                <tr className="bg-pink-200 font-bold text-pink-800">
+                  <td className="p-3">Valor a Receber</td>
+                  <td className="p-3 text-right">
+                    {formatBRL(Number(statsAPI.totalTaxas) + Number(statsAPI.totalComissao))}
+                  </td>
+                </tr>
                 <tr className="bg-green-50 font-bold text-green-800">
                   <td className="p-3">Vendidos + Comissão + Taxas</td>
                   <td className="p-3 text-right">
@@ -993,7 +1008,7 @@ function ResumoTabContent({
                     stats.vendidos -
                     stats.condicionais -
                     stats.baixaOferta -
-                    stats.cancelados}
+                    stats.cancelados - stats.semLicitanteEComLance }
                 </td>
               </tr>
             )}
